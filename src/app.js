@@ -1,28 +1,36 @@
 import express from "express";
 import dotenv from "dotenv";
-const app = express();
-import jwt from "jsonwebtoken";
 import cors from "cors";
-const port = process.env.PORT || 3000;
-import {
-    pool,
-} from "./querys.js";
+import jwt from "jsonwebtoken";
+import { pool } from "./querys.js";
 
-app.listen(port, console.log("SERVER ON"));
-app.use(cors());
-app.use(express.json());
 dotenv.config();
 
+const app = express();
+const port = process.env.PORT || 3000;
+
+// Middlewares
+app.use(cors());
+app.use(express.json());
+
+// Ruta base
 app.get("/", (req, res) => {
-  res.send("Hello World");
+  res.send("Backend funcionando correctamente 🎉");
 });
 
+// 🔥 Verificar conexión a la base de datos ANTES de iniciar el servidor
+const iniciarServidor = async () => {
+  try {
+    await pool.query("SELECT NOW()");
+    console.log("Base de datos conectada correctamente");
 
-pool.query('SELECT 1', (err, res) => {
-  if (err) {
-    console.error('No se pudo conectar a la base de datos:', err);
-  } else {
-    console.log('Base de datos conectada correctamente');
+    app.listen(port, () => {
+      console.log(`SERVER ON en puerto ${port}`);
+    });
+  } catch (err) {
+    console.error("❌ No se pudo conectar a la base de datos:", err.message);
+    process.exit(1); // Evita que Render quede corriendo sin conexión
   }
-});
+};
 
+iniciarServidor();
