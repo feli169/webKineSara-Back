@@ -36,7 +36,7 @@ export const addUser = async (user) => {
 };
 
 export const obtenerServicios = async () => {
-  const consulta = `SELECT * FROM services ORDER BY id ASC`;
+  const consulta = `SELECT * FROM servicios ORDER BY id ASC`;
   const { rows } = await pool.query(consulta);
   return rows;
 };
