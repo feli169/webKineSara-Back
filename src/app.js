@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import jwt from "jsonwebtoken";
-import { addUser } from "./querys.js";
+import { addUser, obtenerServicios } from "./querys.js";
 
 
 dotenv.config();
@@ -16,6 +16,17 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Backend funcionando correctamente 🎉");
 });
+
+app.get("/servicios", async (req, res) => {
+  try {
+    const servicios = await obtenerServicios();
+    res.json(servicios);
+  } catch (error) {
+    console.error("Error obteniendo servicios:", error);
+    res.status(500).json({ error: "No se pudieron obtener los servicios" });
+  }
+});
+
 
 app.post("/usuarios", async (req, res) => { 
   try {

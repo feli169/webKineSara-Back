@@ -5,14 +5,13 @@ import pkg from "pg";
 const { Pool } = pkg;
 import bcrypt from "bcryptjs";
 
-
 export const pool = new Pool({
   user: process.env.DB_USER,
-  host: process.env.DB_HOST,      
+  host: process.env.DB_HOST,
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
-  port: Number(process.env.DB_PORT), 
-  ssl: {rejectUnauthorized: false, },
+  port: Number(process.env.DB_PORT),
+  ssl: { rejectUnauthorized: false },
 });
 
 export const addUser = async (user) => {
@@ -34,4 +33,10 @@ export const addUser = async (user) => {
 
   const { rows } = await pool.query(query, values);
   return rows[0];
+};
+
+export const obtenerServicios = async () => {
+  const consulta = `SELECT * FROM services ORDER BY id ASC`;
+  const { rows } = await pool.query(consulta);
+  return rows;
 };
