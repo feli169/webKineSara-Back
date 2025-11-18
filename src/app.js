@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 app.get("/servicios", async (req, res) => {
   try {
     const servicios = await obtenerServicios();
-    res.json(servicios);
+    res.json({ servicios });
   } catch (error) {
     console.error("Error obteniendo servicios:", error);
     res.status(500).json({ error: "No se pudieron obtener los servicios" });
