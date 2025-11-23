@@ -21,19 +21,47 @@ export const addUser = async (user) => {
     throw new Error("Faltan campos obligatorios");
   }
 
-  const hashedPass = bcrypt.hashSync(Pass, 10);
+  // Convertimos el email a minúsculas para estandarizar
+  const emailLower = Email.toLowerCase();
 
-  const values = [Nombre, Apellido, Email, Telefono || null, hashedPass];
+  try {
+    // Verificar si el email ya existe (ignora mayúsculas)
+    const existingUser = await pool.query(
+      'SELECT * FROM "User" WHERE LOWER("Email") = $1',
+      [emailLower]
+    );
 
-  const query = `
-    INSERT INTO "User" ("Nombre", "Apellido", "Email", "Telefono", "Pass")
-    VALUES ($1, $2, $3, $4, $5)
-    RETURNING *;
-  `;
+    if (existingUser.rows.length > 0) {
+      throw new Error("EMAIL_DUPLICADO");
+    }
 
-  const { rows } = await pool.query(query, values);
-  return rows[0];
+    // Hashear contraseña
+    const hashedPass = bcrypt.hashSync(Pass, 10);
+
+    const values = [Nombre, Apellido, emailLower, Telefono || null, hashedPass];
+
+    const query = `
+      INSERT INTO "User" ("Nombre", "Apellido", "Email", "Telefono", "Pass")
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *;
+    `;
+
+    const { rows } = await pool.query(query, values);
+    return rows[0];
+
+  } catch (error) {
+    // Mantener manejo de error de email duplicado
+    if (error.message === "EMAIL_DUPLICADO") {
+      throw error;
+    }
+
+    // Otros errores de base de datos
+    throw error;
+  }
 };
+
+
+
 
 export const obtenerServicios = async () => {
   const consulta = `SELECT * FROM servicios ORDER BY id ASC`;

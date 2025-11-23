@@ -35,8 +35,10 @@ app.post("/usuarios", async (req, res) => {
     res.json({ message: "User created successfully", user: newUser });
   } catch (error) {
     console.error("Error creando usuario:", error);
+    if (error.message === "EMAIL_DUPLICADO") {
+      return res.status(409).json({ error: "El correo ya está registrado" });
+    }
     res.status(500).json({ error: error.message })
-    console.log(error);
   }
 });
 
