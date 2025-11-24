@@ -38,16 +38,31 @@ app.post("/usuarios", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  console.log("Body recibido:", req.body);
-
   try {
-    const result = await loginUser(req.body);
-    res.json(result);
+    const { Email, Pass } = req.body;
+
+    const user = await loginUser(Email, Pass);
+
+    if (!user) {
+      return res.status(401).json({ error: "Credenciales inválidas" });
+    }
+
+    // Generar token
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    // ✅ SOLO se envía el token
+    res.json({ token });
+
   } catch (error) {
     console.error("Error en login:", error);
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 });
+
 
 app.listen(port, () => {
   console.log(`🟢 SERVER ON en puerto ${port}`);
