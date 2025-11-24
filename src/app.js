@@ -11,6 +11,7 @@ const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
   res.send("Backend funcionando correctamente 🎉");
@@ -38,6 +39,9 @@ app.post("/usuarios", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
+
+console.log("Body recibido:", req.body);
+
   try {
     const { Email, Pass } = req.body;
 
