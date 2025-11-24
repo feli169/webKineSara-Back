@@ -91,3 +91,15 @@ export const loginUser = async ({ Email, Pass }) => {
 
   return { token };
 };
+
+app.post("/login", async (req, res) => {
+  console.log("🔥 BODY REAL:", req.body);
+
+  try {
+    const result = await loginUser(req.body);
+    res.json(result);
+  } catch (error) {
+    console.error("Error en login:", error);
+    res.status(400).json({ error: error.message });
+  }
+});
