@@ -57,9 +57,6 @@ export const loginUser = async ({ Email, Pass }) => {
     [Email]
   );
 
-
-
-
   if (rows.length === 0) {
     throw new Error("Email o contraseña incorrectos");
   }
@@ -68,10 +65,10 @@ export const loginUser = async ({ Email, Pass }) => {
 
   const passMatch = bcrypt.compareSync(Pass, user.Pass);
 
-console.log("Usuario encontrado:", rows[0]);
-console.log("Pass ingresado:", Pass);
-console.log("Pass en BD:", rows[0].Pass);
-console.log("Comparación:", bcrypt.compareSync(Pass, rows[0].Pass));
+  console.log("Usuario encontrado:", user);
+  console.log("Pass ingresado:", Pass);
+  console.log("Pass en BD:", user.Pass);
+  console.log("Comparación:", passMatch);
 
   if (!passMatch) {
     throw new Error("Email o contraseña incorrectos");
@@ -83,5 +80,5 @@ console.log("Comparación:", bcrypt.compareSync(Pass, rows[0].Pass));
     { expiresIn: "2h" }
   );
 
-  return { token, user };
+  return { token };
 };
