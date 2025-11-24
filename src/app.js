@@ -49,3 +49,9 @@ app.post("/login", async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
+
+
+app.get("/debug-users", async (req, res) => {
+  const { rows } = await pool.query('SELECT "Email" FROM "User"');
+  res.json(rows);
+});
