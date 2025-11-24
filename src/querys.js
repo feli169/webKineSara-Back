@@ -69,6 +69,8 @@ export const loginUser = async ({ Email, Pass }) => {
     throw new Error("Email o contraseña incorrectos");
   }
 
+  console.log("JWT_SECRET:", process.env.JWT_SECRET);
+
   const token = jwt.sign(
     { id: user.id, email: user.Email },
     process.env.JWT_SECRET,
