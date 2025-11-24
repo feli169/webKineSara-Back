@@ -1,4 +1,6 @@
 import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
+
 dotenv.config();
 
 import pkg from "pg";
