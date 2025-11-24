@@ -1,10 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import jwt from "jsonwebtoken";
 
 import { addUser, obtenerServicios, loginUser } from "./querys.js";
-
 
 dotenv.config();
 
@@ -23,26 +21,25 @@ app.get("/servicios", async (req, res) => {
     const servicios = await obtenerServicios();
     res.json({ servicios });
   } catch (error) {
-    console.error("Error obteniendo servicios:", error);
     res.status(500).json({ error: "No se pudieron obtener los servicios" });
   }
 });
 
-app.post("/usuarios", async (req, res) => { 
+app.post("/usuarios", async (req, res) => {
   try {
-    const user = req.body;
-    const newUser = await addUser(user);
+    const newUser = await addUser(req.body);
     res.json({ message: "User created successfully", user: newUser });
   } catch (error) {
-    console.error("Error creando usuario:", error);
     if (error.message === "EMAIL_DUPLICADO") {
       return res.status(409).json({ error: "El correo ya está registrado" });
     }
-    res.status(500).json({ error: error.message })
+    res.status(500).json({ error: error.message });
   }
 });
 
 app.post("/login", async (req, res) => {
+  console.log("Body recibido:", req.body);
+
   try {
     const result = await loginUser(req.body);
     res.json(result);
@@ -50,4 +47,8 @@ app.post("/login", async (req, res) => {
     console.error("Error en login:", error);
     res.status(400).json({ error: error.message });
   }
+});
+
+app.listen(port, () => {
+  console.log(`🟢 SERVER ON en puerto ${port}`);
 });
