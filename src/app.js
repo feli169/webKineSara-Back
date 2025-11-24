@@ -27,7 +27,6 @@ app.get("/servicios", async (req, res) => {
   }
 });
 
-
 app.post("/usuarios", async (req, res) => { 
   try {
     const user = req.body;
@@ -42,20 +41,10 @@ app.post("/usuarios", async (req, res) => {
   }
 });
 
-
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import pool from "../db.js"; // tu conexión a Postgres
-
 app.post("/login", async (req, res) => {
+  console.log("Body recibido:", req.body);
   try {
     const { Email, Pass } = req.body;
-
-    if (!Email || !Pass) {
-      return res.status(400).json({ error: "Faltan campos obligatorios" });
-    }
-
-    // Buscar usuario por email (ignora mayúsculas)
     const { rows } = await pool.query(
       'SELECT * FROM "User" WHERE LOWER("Email") = LOWER($1)',
       [Email]
@@ -66,40 +55,18 @@ app.post("/login", async (req, res) => {
     }
 
     const user = rows[0];
-
-    // Comparar contraseña con bcrypt
     const passMatch = bcrypt.compareSync(Pass, user.Pass);
     if (!passMatch) {
       return res.status(401).json({ error: "Email o contraseña incorrectos" });
     }
 
-    // Generar token JWT
-    const token = jwt.sign(
-      { id: user.id, email: user.Email },
-      process.env.JWT_SECRET,
-      { expiresIn: "2h" }
-    );
-
-    // Enviar token y datos del usuario
-    res.json({
-      token,
-      user: {
-        id: user.id,
-        Nombre: user.Nombre,
-        Apellido: user.Apellido,
-        Email: user.Email,
-        Telefono: user.Telefono,
-      },
-    });
-
+    const token = jwt.sign({ id: user.id, email: user.Email }, process.env.JWT_SECRET, { expiresIn: "2h" });
+    res.json({ token, user: { id: user.id, Nombre: user.Nombre, Apellido: user.Apellido, Email: user.Email, Telefono: user.Telefono } });
   } catch (error) {
     console.error("Error en login:", error);
     res.status(500).json({ error: "Error en el servidor" });
   }
 });
-
-
-
 
 app.listen(port, () => {
   console.log(`🟢 SERVER ON en puerto ${port}`);
