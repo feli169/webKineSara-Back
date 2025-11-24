@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import jwt from "jsonwebtoken";
+
 import { addUser, obtenerServicios, loginUser } from "./querys.js";
 
 
