@@ -57,6 +57,9 @@ export const loginUser = async ({ Email, Pass }) => {
     [Email]
   );
 
+console.log("Resultado compare:", passMatch);
+
+
   if (rows.length === 0) {
     throw new Error("Email o contraseña incorrectos");
   }
