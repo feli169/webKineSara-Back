@@ -52,32 +52,28 @@ export const obtenerServicios = async () => {
 };
 
 export const loginUser = async ({ Email, Pass }) => {
-
-  console.log("📩 Email recibido:", Email);
-  console.log("🔑 Pass recibido:", Pass);
-
   const { rows } = await pool.query(
     'SELECT * FROM "User" WHERE LOWER("Email") = LOWER($1)',
     [Email]
   );
 
-  console.log("🗂 Resultado DB:", rows);
+
+
 
   if (rows.length === 0) {
-    console.log("❌ No existe el usuario");
     throw new Error("Email o contraseña incorrectos");
   }
 
   const user = rows[0];
 
-  console.log("🔐 Pass en BD:", user.Pass);
-
   const passMatch = bcrypt.compareSync(Pass, user.Pass);
 
-  console.log("✅ Comparación bcrypt:", passMatch);
+console.log("Usuario encontrado:", rows[0]);
+console.log("Pass ingresado:", Pass);
+console.log("Pass en BD:", rows[0].Pass);
+console.log("Comparación:", bcrypt.compareSync(Pass, rows[0].Pass));
 
   if (!passMatch) {
-    console.log("❌ Contraseña no coincide");
     throw new Error("Email o contraseña incorrectos");
   }
 
@@ -87,19 +83,5 @@ export const loginUser = async ({ Email, Pass }) => {
     { expiresIn: "2h" }
   );
 
-  console.log("🎫 TOKEN GENERADO:", token);
-
-  return { token };
+  return { token, user };
 };
-
-app.post("/login", async (req, res) => {
-  console.log("🔥 BODY REAL:", req.body);
-
-  try {
-    const result = await loginUser(req.body);
-    res.json(result);
-  } catch (error) {
-    console.error("Error en login:", error);
-    res.status(400).json({ error: error.message });
-  }
-});
