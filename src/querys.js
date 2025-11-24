@@ -21,7 +21,7 @@ export const addUser = async (user) => {
     throw new Error("Faltan campos obligatorios");
   }
 
-  // Convertimos el email a minúsculas para estandarizar
+  // Convertimos el email a minúsculas
   const emailLower = Email.toLowerCase();
 
   try {

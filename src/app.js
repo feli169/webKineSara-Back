@@ -50,6 +50,11 @@ app.post("/login", async (req, res) => {
       [Email]
     );
 
+    console.log("Usuario encontrado:", rows[0]);
+console.log("Valor columna Pass:", rows[0]?.Pass);
+console.log("Valor Email:", rows[0]?.Email);
+
+
     if (rows.length === 0) {
       return res.status(401).json({ error: "Email o contraseña incorrectos" });
     }
