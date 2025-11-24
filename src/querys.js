@@ -52,25 +52,32 @@ export const obtenerServicios = async () => {
 };
 
 export const loginUser = async ({ Email, Pass }) => {
+
+  console.log("📩 Email recibido:", Email);
+  console.log("🔑 Pass recibido:", Pass);
+
   const { rows } = await pool.query(
     'SELECT * FROM "User" WHERE LOWER("Email") = LOWER($1)',
     [Email]
   );
 
+  console.log("🗂 Resultado DB:", rows);
+
   if (rows.length === 0) {
+    console.log("❌ No existe el usuario");
     throw new Error("Email o contraseña incorrectos");
   }
 
   const user = rows[0];
 
+  console.log("🔐 Pass en BD:", user.Pass);
+
   const passMatch = bcrypt.compareSync(Pass, user.Pass);
 
-  console.log("Usuario encontrado:", user);
-  console.log("Pass ingresado:", Pass);
-  console.log("Pass en BD:", user.Pass);
-  console.log("Comparación:", passMatch);
+  console.log("✅ Comparación bcrypt:", passMatch);
 
   if (!passMatch) {
+    console.log("❌ Contraseña no coincide");
     throw new Error("Email o contraseña incorrectos");
   }
 
@@ -79,6 +86,8 @@ export const loginUser = async ({ Email, Pass }) => {
     process.env.JWT_SECRET,
     { expiresIn: "2h" }
   );
+
+  console.log("🎫 TOKEN GENERADO:", token);
 
   return { token };
 };
