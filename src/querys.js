@@ -1,20 +1,8 @@
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
+import { pool } from "./db.js";
 
 dotenv.config();
-
-import pkg from "pg";
-const { Pool } = pkg;
-import bcrypt from "bcryptjs";
-
-export const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: Number(process.env.DB_PORT),
-  ssl: { rejectUnauthorized: false },
-});
 
 export const addUser = async (user) => {
   const { Nombre, Apellido, Email, Telefono, Pass } = user;
@@ -75,11 +63,16 @@ export const loginUser = async ({ Email, Pass }) => {
     [Email]
   );
 
+
   if (rows.length === 0) {
     throw new Error("Email o contraseña incorrectos");
   }
 
   const user = rows[0];
+
+console.log("Pass en BD:", user.Pass);
+console.log("Pass ingresado:", Pass);
+console.log("Comparación:", bcrypt.compareSync(Pass, user.Pass));
 
   // Comparar contraseña con hash
   const passMatch = bcrypt.compareSync(Pass, user.Pass);
