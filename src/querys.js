@@ -60,11 +60,47 @@ export const addUser = async (user) => {
   }
 };
 
-
-
-
 export const obtenerServicios = async () => {
   const consulta = `SELECT * FROM servicios ORDER BY id ASC`;
   const { rows } = await pool.query(consulta);
   return rows;
+};
+
+export const loginUser = async ({ Email, Pass }) => {
+  // Buscar usuario
+  const { rows } = await pool.query(
+    'SELECT * FROM "User" WHERE LOWER("Email") = LOWER($1)',
+    [Email]
+  );
+
+  if (rows.length === 0) {
+    throw new Error("Email o contraseña incorrectos");
+  }
+
+  const user = rows[0];
+
+  // Comparar contraseña con hash
+  const passMatch = bcrypt.compareSync(Pass, user.Pass);
+
+  if (!passMatch) {
+    throw new Error("Email o contraseña incorrectos");
+  }
+
+  // Crear token
+  const token = jwt.sign(
+    { id: user.id, email: user.Email },
+    process.env.JWT_SECRET,
+    { expiresIn: "2h" }
+  );
+
+  return {
+    token,
+    user: {
+      id: user.id,
+      Nombre: user.Nombre,
+      Apellido: user.Apellido,
+      Email: user.Email,
+      Telefono: user.Telefono,
+    }
+  };
 };

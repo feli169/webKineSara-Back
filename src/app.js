@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import jwt from "jsonwebtoken";
-import { addUser, obtenerServicios } from "./querys.js";
+import { addUser, obtenerServicios, loginUser } from "./querys.js";
 
 
 dotenv.config();
@@ -42,37 +42,11 @@ app.post("/usuarios", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  console.log("Body recibido:", req.body);
   try {
-    const { Email, Pass } = req.body;
-    const { rows } = await pool.query(
-      'SELECT * FROM "User" WHERE LOWER("Email") = LOWER($1)',
-      [Email]
-    );
-
-    console.log("Usuario encontrado:", rows[0]);
-console.log("Valor columna Pass:", rows[0]?.Pass);
-console.log("Valor Email:", rows[0]?.Email);
-
-
-    if (rows.length === 0) {
-      return res.status(401).json({ error: "Email o contraseña incorrectos" });
-    }
-
-    const user = rows[0];
-    const passMatch = bcrypt.compareSync(Pass, user.Pass);
-    if (!passMatch) {
-      return res.status(401).json({ error: "Email o contraseña incorrectos" });
-    }
-
-    const token = jwt.sign({ id: user.id, email: user.Email }, process.env.JWT_SECRET, { expiresIn: "2h" });
-    res.json({ token, user: { id: user.id, Nombre: user.Nombre, Apellido: user.Apellido, Email: user.Email, Telefono: user.Telefono } });
+    const result = await loginUser(req.body);
+    res.json(result);
   } catch (error) {
     console.error("Error en login:", error);
-    res.status(500).json({ error: "Error en el servidor" });
+    res.status(400).json({ error: error.message });
   }
-});
-
-app.listen(port, () => {
-  console.log(`🟢 SERVER ON en puerto ${port}`);
 });
