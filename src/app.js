@@ -1,3 +1,6 @@
+console.log("===> app.js SE ESTÁ EJECUTANDO");
+
+
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -56,4 +59,9 @@ app.post("/login", async (req, res) => {
 app.get("/debug-users", async (req, res) => {
   const { rows } = await pool.query('SELECT "Email" FROM "User"');
   res.json(rows);
+});
+
+
+app.listen(port, () => {
+  console.log(`🟢 SERVER ON en puerto ${port}`);
 });
